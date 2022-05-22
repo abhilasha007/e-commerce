@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Row, Col, Button, ListGroup, Image, Card } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import Message from '../components/Message'
 import CheckoutSteps from '../components/CheckoutSteps'
+import { createOrder } from '../actions/orderAction'
 
 const PlaceOrderScreen = () => {
 	const dispatch = useDispatch()
@@ -32,7 +33,30 @@ const PlaceOrderScreen = () => {
 		Number(cart.taxPrice)
 	).toFixed(2)
 
-	const placeOrderHandler = () => {}
+	const orderCreate = useSelector((state) => state.orderCreate)
+	const { order, success, error } = orderCreate
+	console.log(orderCreate)
+	useEffect(() => {
+		if (success) {
+			navigate(`/order/${order._id}`)
+		}
+		// eslint-disable-next-line
+	}, [navigate, success])
+
+	const placeOrderHandler = () => {
+		dispatch(
+			createOrder({
+				orderItems: cart.cartItems,
+				shippingAddress: cart.shippingAddress,
+				paymentMethod: cart.paymentMethod,
+				itemsPrice: cart.itemsPrice,
+				shippingPrice: cart.shippingPrice,
+				taxPrice: cart.taxPrice,
+				totalPrice: cart.totalPrice,
+			})
+		)
+	}
+
 	return (
 		<div>
 			<CheckoutSteps step1 step2 step3 step4 />
@@ -76,7 +100,8 @@ const PlaceOrderScreen = () => {
 													</Link>
 												</Col>
 												<Col md={4}>
-													{item.qty} x ${item.price} = ${addDecimals(item.qty * item.price)}
+													{item.qty} x ${item.price} = $
+													{addDecimals(item.qty * item.price)}
 												</Col>
 											</Row>
 										</ListGroup.Item>
@@ -117,10 +142,11 @@ const PlaceOrderScreen = () => {
 									<Col>${cart.totalPrice}</Col>
 								</Row>
 							</ListGroup.Item>
-							{/* <ListGroup.Item>
-								{error && <Message variant='danger'>{error}</Message>}
-							</ListGroup.Item> */}
 							<ListGroup.Item>
+								{error && <Message variant='danger'>{error}</Message>}
+							</ListGroup.Item>
+							<ListGroup.Item>
+							<div className='d-grid gap-2'>
 								<Button
 									type='button'
 									className='btn-block'
@@ -129,6 +155,7 @@ const PlaceOrderScreen = () => {
 								>
 									Place Order
 								</Button>
+							</div>
 							</ListGroup.Item>
 						</ListGroup>
 					</Card>
