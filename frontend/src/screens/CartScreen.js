@@ -23,7 +23,6 @@ const CartScreen = () => {
 
 	const cart = useSelector((state) => state.cart);
 	const { cartItems } = cart;
-	console.log(cartItems);
 	useEffect(() => {
 		if (productId) {
 			dispatch(addToCart(productId, qty));
@@ -34,7 +33,7 @@ const CartScreen = () => {
         dispatch(removeFromCart(id))
     };
 	const checkoutHandler = () => {
-        navigate('/login?redirect=shipping')
+        navigate('/shipping') ///login?redirect=shipping
     };
 
 	return (
